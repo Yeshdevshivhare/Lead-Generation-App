@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeadDork - Auto Dork Tool</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ---------- Reset ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes gradientLoop {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ---------- GLOBAL TRANSITIONS ---------- */
+    /* This makes every color change smooth when you hover */
+    body, .container, button, input, select, .sidebar, .sidebar button {
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* ---------- DARK MODE (Deep Space) ---------- */
+    body { 
+      font-family: 'Inter', sans-serif; 
+      color: #fff; 
+      
+      /* Dark: Black -> Navy -> Deep Purple */
+      background: linear-gradient(-45deg, #000000, #1e1e2f, #280a2e, #0f2027);
+      background-size: 400% 400%;
+      animation: gradientLoop 15s ease infinite;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    input, select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+    
+    /* Hover Effects in Dark Mode */
+    .container:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); }
+    input:hover, select:hover { border-color: #66aaff; background: rgba(0,0,0,0.6); }
+
+    /* ---------- LIGHT MODE (Red -> Green Spectrum) ---------- */
+    body.light { 
+      color: #1a202c; 
+      
+      /* Light: Coral Red -> Peach -> Light Green -> Mint */
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
+      background-size: 400% 400%;
+      /* Animation inherits */
+    }
+    
+    /* Light Sidebar */
+    body.light .sidebar { background: rgba(255, 255, 255, 0.7); border-right: 1px solid rgba(255,255,255,0.5); }
+    body.light .sidebar button { background: rgba(255,255,255,0.6); color: #444; font-weight: 600; border: 1px solid transparent; }
+    
+    /* Hover Sidebar Light */
+    body.light .sidebar button:hover { background: #fff; color: #ff6b6b; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    body.light .sidebar button.active { background: #fff; color: #ff6b6b; border-left: 4px solid #ff6b6b; }
+    body.light .sidebar h2 { -webkit-background-clip: unset; background: transparent; color: #ff6b6b; }
+
+    /* Light Container */
+    body.light .container { 
+      background: rgba(255,255,255,0.9); 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+      color: #000; 
+      border: 1px solid #fff;
+    }
+    
+    /* Hover Container Light */
+    body.light .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Stronger lift effect */
+    }
+    
+    /* Light Inputs */
+    body.light select, body.light input[type="search"] { 
+      background: #fdfdfd; 
+      border: 2px solid #e2e8f0; 
+      color: #000; 
+      font-weight: 500;
+    }
+    
+    /* Hover Inputs Light */
+    body.light select:hover, body.light input:hover { border-color: #ff9a9e; background: #fff; }
+    body.light select:focus, body.light input:focus { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
+
+    /* Light Buttons */
+    body.light #saveBtn { background: #edf2f7; color: #2d3748; border: 2px solid #cbd5e0; }
+    body.light #saveBtn:hover { background: #fff; border-color: #ff9a9e; color: #ff6b6b; }
+    
+    body.light #searchBtn { background: linear-gradient(135deg, #ff9a9e, #ff6b6b); border: none; }
+    body.light #searchBtn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4); }
+
+    /* ---------- Layout ---------- */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 250px; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); padding: 30px; display: flex; flex-direction: column; transition: 0.3s; z-index: 2; }
+    .sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 24px; background: linear-gradient(90deg,#66aaff,#ff77ff); -webkit-background-clip: text; color: transparent; font-weight: 800; letter-spacing: 1px; }
+    .sidebar button { margin: 8px 0; padding: 14px; border: none; border-radius: 10px; background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; text-align: left; }
+    .sidebar button i { margin-right: 12px; width: 20px; text-align: center; }
+    .sidebar button:hover, .sidebar button.active { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+    
+    /* Exit Button */
+    #btnExit { margin-top: auto; background: rgba(255, 50, 50, 0.2); color: #ffadad; }
+    #btnExit:hover { background: rgba(255, 50, 50, 0.5); transform: scale(1.05); }
+    body.light #btnExit { background: #fff0f0; color: #e53e3e; border: 1px solid #fc8181; }
+    body.light #btnExit:hover { background: #e53e3e; color: #fff; }
+
+    /* Main Content */
+    .main { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
+
+    /* Toggle Switch */
+    .top-bar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+    .toggle { display: flex; align-items: center; cursor: pointer; user-select: none; }
+    .toggle span.icon { font-size: 22px; margin-right: 12px; transition: 0.3s; }
+    .toggle input { display: none; }
+    .slider { width: 50px; height: 26px; background: #ccc; border-radius: 50px; position: relative; transition: 0.4s; }
+    .slider:before { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: 0.4s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    input:checked + .slider { background: #66aaff; }
+    input:checked + .slider:before { transform: translateX(24px); }
+    /* Light Mode Toggle Color */
+    body.light input:checked + .slider { background: #ff6b6b; }
+
+    /* Containers */
+    .container { background: rgba(255,255,255,0.05); backdrop-filter: blur(14px); padding: 40px; border-radius: 24px; width: 100%; max-width: 800px; margin: 0 auto; animation: fadeIn 0.5s ease; border: 1px solid rgba(255,255,255,0.1); }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:translateY(0);} }
+
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 30px; background: linear-gradient(90deg, #66aaff, #ff77ff); -webkit-background-clip: text; color: transparent; text-align: center; }
+    
+    label { font-size: 14px; font-weight: 600; margin-bottom: 5px; display: block; opacity: 0.8; }
+    select, input[type="search"] { width: 100%; padding: 16px; margin-top: 5px; margin-bottom: 20px; font-size: 16px; border-radius: 12px; outline: none; }
+    select:focus, input:focus { border-color: #66aaff; background: rgba(0,0,0,0.4); }
+
+    /* Action Buttons */
+    .action-btn { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; color: #fff; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+    
+    #searchBtn { background: linear-gradient(135deg, #4a8cff, #9b59ff); box-shadow: 0 4px 15px rgba(74, 140, 255, 0.4); }
+    #searchBtn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(74, 140, 255, 0.6); }
+    
+    #saveBtn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+    #saveBtn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+    #result { margin-top: 30px; padding: 20px; background: rgba(100,255,100,0.1); border: 1px solid rgba(100,255,100,0.2); border-radius: 14px; display: none; text-align: center; color: inherit; }
+    a { color: #66aaff; text-decoration: none; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+
+    /* Lists */
+    .history-panel { margin-top: 20px; }
+    .history-panel ul { list-style: none; }
+    .history-panel li { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+    .history-panel li:last-child { border-bottom: none; }
+    .history-panel li:hover { background: rgba(255,255,255,0.05); border-radius: 8px; padding-left: 20px; } /* Little shift right on hover */
+    .history-meta { display: flex; flex-direction: column; }
+    .history-kw { font-weight: bold; font-size: 16px; }
+    .history-cat { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+    .delete-btn { color: #ff5555; cursor: pointer; opacity: 0.5; padding: 8px; font-size: 14px; }
+    .delete-btn:hover { opacity: 1; transform: scale(1.2); }
+
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <h2>LeadDork</h2>
+      <button id="navSearch" class="active"><i class="fas fa-magnifying-glass"></i> Search</button>
+      <button id="navSaved"><i class="fas fa-star"></i> Saved Searches</button>
+      <button id="navHistory"><i class="fas fa-clock"></i> History Log</button>
+      <button id="btnExit"><i class="fas fa-power-off"></i> Exit App</button>
+    </div>
+
+    <div class="main">
+      <div class="top-bar">
+        <label class="toggle">
+          <span class="icon" id="modeIcon">🌙</span>
+          <input type="checkbox" id="darkToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="container view-section active" id="viewSearch">
+        <h1>Auto Dork</h1>
+        <label>Category</label>
+        <select id="category">
+          <option value="animation">Animation / GIF / Lottie</option>
+          <option value="palette">Color Palette / Swatches</option>
+          <option value="drawing">Line Art / Sketch / Drawing</option>
+          <option value="stockimage">Stock Image (Transparent)</option>
+          <option value="stockvector">Stock Vector (SVG/EPS/AI)</option>
+          <option value="stockvideo">Stock Video (MP4/MOV)</option>
+          <option value="spritesheet">Sprite Sheet / Game Assets</option>
+          <option value="reference">Pose / Anatomy Reference</option>
+          <option value="brush">Brushes (Photoshop/Procreate)</option>
+          <option value="3dmodel">Free 3D Model (OBJ/FBX)</option>
+        </select>
+        <label>Keyword</label>
+        <input type="search" id="keyword" placeholder="e.g. Indian, Cyberpunk, Cat..." autofocus />
+        <button id="searchBtn" class="action-btn">Search with Dork Magic ✨</button>
+        <button id="saveBtn" class="action-btn">Save this Search ⭐</button>
+        <div id="result"></div>
+      </div>
+
+      <div class="container view-section" id="viewSaved">
+        <h1>Saved Searches</h1>
+        <div class="history-panel" id="savedPanel"></div>
+      </div>
+
+      <div class="container view-section" id="viewHistory">
+        <h1>Search History</h1>
+        <div class="history-panel" id="historyPanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dorks = {
+        animation: `"KEYWORD" (intitle:"animation" OR intext:"loop" OR intext:"gif" OR intext:"lottie") (filetype:gif OR filetype:json OR filetype:mp4 OR filetype:webm) -inurl:(signup login pinterest behance)`,
+        palette: `"KEYWORD" (intitle:"palette" OR intext:"color palette" OR intext:"swatches" OR intext:"hex") (filetype:png OR filetype:ase OR filetype:aco OR filetype:gpl)`,
+        drawing: `"KEYWORD" (intitle:"line art" OR intitle:"drawing" OR intitle:"sketch") (filetype:png OR filetype:jpg) (transparent OR "on transparent")`,
+        stockimage: `"KEYWORD" (filetype:png OR filetype:jpg) (intitle:"free" OR inurl:free OR inurl:cc0 OR inurl:"public domain") -inurl:(shutterstock istock getty adobe)`,
+        stockvector: `"KEYWORD" (filetype:svg OR filetype:eps OR filetype:ai OR filetype:pdf) (inurl:"free download" OR inurl:vector OR inurl:cc0)`,
+        stockvideo: `"KEYWORD" (filetype:mp4 OR filetype:mov) (site:pexels.com OR site:pixabay.com OR site:mixkit.co OR site:videvo.net OR site:coverr.co)`,
+        spritesheet: `"KEYWORD" (intitle:"sprite sheet" OR intext:"sprite sheet") filetype:png`,
+        reference: `"KEYWORD" (intitle:"reference" OR intitle:"pose" OR intitle:"anatomy") (filetype:jpg OR filetype:png)`,
+        brush: `"KEYWORD" (brushes OR "brush pack") (filetype:abr OR filetype:brush OR filetype:procreate) inurl:"free download"`,
+        "3dmodel": `"KEYWORD" (filetype:obj OR filetype:fbx OR filetype:gltf OR filetype:glb OR filetype:blend) (inurl:"free download" OR site:sketchfab.com OR site:thingiverse.com)`
+      };
+
+      const views = { search: document.getElementById('viewSearch'), saved: document.getElementById('viewSaved'), history: document.getElementById('viewHistory') };
+      const navs = { search: document.getElementById('navSearch'), saved: document.getElementById('navSaved'), history: document.getElementById('navHistory') };
+
+      function switchView(viewName) {
+        Object.values(views).forEach(el => el.classList.remove('active'));
+        Object.values(navs).forEach(el => el.classList.remove('active'));
+        views[viewName].classList.add('active');
+        navs[viewName].classList.add('active');
+        if(viewName === 'saved') updateSaved();
+        if(viewName === 'history') updateHistory();
+      }
+
+      navs.search.addEventListener('click', () => switchView('search'));
+      navs.saved.addEventListener('click', () => switchView('saved'));
+      navs.history.addEventListener('click', () => switchView('history'));
+
+      document.getElementById('btnExit').addEventListener('click', () => {
+        if(confirm('Close LeadDork completely?')) {
+          fetch('/shutdown', { method: 'POST' });
+          document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:#fff;'>App Closed. You can close this tab.</h1>";
+        }
+      });
+
+      function renderList(dataArray, elementId, isSavedList) {
+        const el = document.getElementById(elementId);
+        if(!dataArray || dataArray.length === 0) { el.innerHTML = '<p style="text-align:center; opacity:0.5;">Nothing here yet.</p>'; return; }
+        let html = '<ul>';
+        dataArray.forEach(item => {
+          html += `<li><div class="history-meta"><span class="history-kw">${item.keyword}</span><span class="history-cat">${item.category}</span></div><div class="actions"><i class="fas fa-trash delete-btn" onclick="deleteItem('${isSavedList ? 'saved' : 'history'}', ${item.id})"></i></div></li>`;
+        });
+        html += '</ul>';
+        el.innerHTML = html;
+      }
+
+      window.deleteItem = function(type, id) {
+        if(!confirm('Delete this?')) return;
+        fetch(`/api/${type}/delete/${id}`, { method: 'DELETE' }).then(() => { if(type === 'saved') updateSaved(); else updateHistory(); });
+      };
+
+      function updateHistory() { fetch('/api/history/get').then(res=>res.json()).then(data=>renderList(data.history,'historyPanel',false)); }
+      function updateSaved() { fetch('/api/saved/get').then(res=>res.json()).then(data=>renderList(data.saved,'savedPanel',true)); }
+
+      document.getElementById('searchBtn').addEventListener('click', () => {
+        const category = document.getElementById('category').value;
+        const keyword = document.getElementById('keyword').value.trim();
+        if(!keyword) return alert('Keyword required!');
+        const url = 'https://www.google.com/search?q=' + encodeURIComponent(dorks[category].replace(/KEYWORD/g, keyword));
+        document.getElementById('result').innerHTML = `<strong>Searching:</strong> ${keyword}<br><a href="${url}" target="_blank">Open Link</a>`;
+        document.getElementById('result').style.display = 'block';
+        fetch('/api/history/add', { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({keyword,category}) });
+        window.open(url, '_blank');
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const category = document.getElementById('category').value;
+        const keyword = document.getElementById('keyword').value.trim();
+        if(!keyword) return alert('Keyword required!');
+        fetch('/api/saved/add', { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({keyword,category}) }).then(() => alert('Saved! ⭐'));
+      });
+
+      const darkToggle = document.getElementById('darkToggle');
+      darkToggle.addEventListener('change', () => {
+        document.body.classList.toggle('light');
+        document.getElementById('modeIcon').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+      });
+    });
+  </script>
+</body>
+</html>

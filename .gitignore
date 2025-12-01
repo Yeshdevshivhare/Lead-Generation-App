@@ -1,0 +1,11 @@
+# Ignore the database (it contains your personal history)
+database.db
+
+# Ignore build artifacts and exe files
+build/
+dist/
+*.spec
+*.exe
+
+# Ignore Python cache
+__pycache__/

@@ -3,300 +3,2674 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LeadDork - Auto Dork Tool</title>
+  <title>Lead Intelligence Suite</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* ---------- Reset ---------- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
-    /* ---------- ANIMATIONS ---------- */
-    @keyframes gradientLoop {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ---------- GLOBAL TRANSITIONS ---------- */
-    /* This makes every color change smooth when you hover */
-    body, .container, button, input, select, .sidebar, .sidebar button {
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-
-    /* ---------- DARK MODE (Deep Space) ---------- */
     body { 
-      font-family: 'Inter', sans-serif; 
-      color: #fff; 
-      
-      /* Dark: Black -> Navy -> Deep Purple */
-      background: linear-gradient(-45deg, #000000, #1e1e2f, #280a2e, #0f2027);
-      background-size: 400% 400%;
-      animation: gradientLoop 15s ease infinite;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      color: #e5e7eb; 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       height: 100vh;
-      width: 100vw;
+      overflow: hidden;
     }
 
-    input, select { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+    input, select, textarea { 
+      background: rgba(15, 23, 42, 0.8); 
+      color: #e5e7eb; 
+      border: 1px solid rgba(148, 163, 184, 0.3); 
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
     
-    /* Hover Effects in Dark Mode */
-    .container:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); }
-    input:hover, select:hover { border-color: #66aaff; background: rgba(0,0,0,0.6); }
+    input:focus, select:focus, textarea:focus { 
+      border-color: #3b82f6; 
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 
-    /* ---------- LIGHT MODE (Red -> Green Spectrum) ---------- */
-    body.light { 
-      color: #1a202c; 
-      
-      /* Light: Coral Red -> Peach -> Light Green -> Mint */
-      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
-      background-size: 400% 400%;
-      /* Animation inherits */
+    .app { display: flex; height: 100vh; }
+    
+    .sidebar { 
+      width: 260px; 
+      background: rgba(15, 23, 42, 0.95); 
+      backdrop-filter: blur(10px); 
+      padding: 24px 16px; 
+      display: flex; 
+      flex-direction: column; 
+      border-right: 1px solid rgba(148, 163, 184, 0.1);
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     
-    /* Light Sidebar */
-    body.light .sidebar { background: rgba(255, 255, 255, 0.7); border-right: 1px solid rgba(255,255,255,0.5); }
-    body.light .sidebar button { background: rgba(255,255,255,0.6); color: #444; font-weight: 600; border: 1px solid transparent; }
-    
-    /* Hover Sidebar Light */
-    body.light .sidebar button:hover { background: #fff; color: #ff6b6b; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    body.light .sidebar button.active { background: #fff; color: #ff6b6b; border-left: 4px solid #ff6b6b; }
-    body.light .sidebar h2 { -webkit-background-clip: unset; background: transparent; color: #ff6b6b; }
-
-    /* Light Container */
-    body.light .container { 
-      background: rgba(255,255,255,0.9); 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-      color: #000; 
-      border: 1px solid #fff;
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
     }
     
-    /* Hover Container Light */
-    body.light .container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Stronger lift effect */
+    .sidebar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
     }
     
-    /* Light Inputs */
-    body.light select, body.light input[type="search"] { 
-      background: #fdfdfd; 
-      border: 2px solid #e2e8f0; 
-      color: #000; 
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.5);
+      border-radius: 3px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.7);
+    }
+    
+    .sidebar h2 { 
+      text-align: center; 
+      margin-bottom: 32px; 
+      font-size: 18px; 
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800; 
+    }
+    
+    .sidebar button { 
+      margin: 4px 0; 
+      padding: 12px 16px; 
+      border: none; 
+      border-radius: 8px; 
+      background: transparent; 
+      color: #cbd5e1; 
+      font-size: 13px; 
       font-weight: 500;
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      text-align: left;
+      transition: all 0.2s;
     }
     
-    /* Hover Inputs Light */
-    body.light select:hover, body.light input:hover { border-color: #ff9a9e; background: #fff; }
-    body.light select:focus, body.light input:focus { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
-
-    /* Light Buttons */
-    body.light #saveBtn { background: #edf2f7; color: #2d3748; border: 2px solid #cbd5e0; }
-    body.light #saveBtn:hover { background: #fff; border-color: #ff9a9e; color: #ff6b6b; }
+    .sidebar button i { 
+      margin-right: 12px; 
+      width: 18px; 
+      text-align: center;
+    }
     
-    body.light #searchBtn { background: linear-gradient(135deg, #ff9a9e, #ff6b6b); border: none; }
-    body.light #searchBtn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4); }
-
-    /* ---------- Layout ---------- */
-    .app { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar button:hover { 
+      background: rgba(59, 130, 246, 0.1); 
+      color: #e5e7eb;
+    }
     
-    /* Sidebar */
-    .sidebar { width: 250px; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); padding: 30px; display: flex; flex-direction: column; transition: 0.3s; z-index: 2; }
-    .sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 24px; background: linear-gradient(90deg,#66aaff,#ff77ff); -webkit-background-clip: text; color: transparent; font-weight: 800; letter-spacing: 1px; }
-    .sidebar button { margin: 8px 0; padding: 14px; border: none; border-radius: 10px; background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; text-align: left; }
-    .sidebar button i { margin-right: 12px; width: 20px; text-align: center; }
-    .sidebar button:hover, .sidebar button.active { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+    .sidebar button.active { 
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
     
-    /* Exit Button */
-    #btnExit { margin-top: auto; background: rgba(255, 50, 50, 0.2); color: #ffadad; }
-    #btnExit:hover { background: rgba(255, 50, 50, 0.5); transform: scale(1.05); }
-    body.light #btnExit { background: #fff0f0; color: #e53e3e; border: 1px solid #fc8181; }
-    body.light #btnExit:hover { background: #e53e3e; color: #fff; }
-
-    /* Main Content */
-    .main { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
-
-    /* Toggle Switch */
-    .top-bar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-    .toggle { display: flex; align-items: center; cursor: pointer; user-select: none; }
-    .toggle span.icon { font-size: 22px; margin-right: 12px; transition: 0.3s; }
-    .toggle input { display: none; }
-    .slider { width: 50px; height: 26px; background: #ccc; border-radius: 50px; position: relative; transition: 0.4s; }
-    .slider:before { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: 0.4s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    input:checked + .slider { background: #66aaff; }
-    input:checked + .slider:before { transform: translateX(24px); }
-    /* Light Mode Toggle Color */
-    body.light input:checked + .slider { background: #ff6b6b; }
-
-    /* Containers */
-    .container { background: rgba(255,255,255,0.05); backdrop-filter: blur(14px); padding: 40px; border-radius: 24px; width: 100%; max-width: 800px; margin: 0 auto; animation: fadeIn 0.5s ease; border: 1px solid rgba(255,255,255,0.1); }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:translateY(0);} }
-
-    h1 { font-size: 26px; font-weight: 700; margin-bottom: 30px; background: linear-gradient(90deg, #66aaff, #ff77ff); -webkit-background-clip: text; color: transparent; text-align: center; }
+    #btnExit { 
+      margin-top: auto; 
+      background: rgba(239, 68, 68, 0.15); 
+      color: #fca5a5;
+    }
     
-    label { font-size: 14px; font-weight: 600; margin-bottom: 5px; display: block; opacity: 0.8; }
-    select, input[type="search"] { width: 100%; padding: 16px; margin-top: 5px; margin-bottom: 20px; font-size: 16px; border-radius: 12px; outline: none; }
-    select:focus, input:focus { border-color: #66aaff; background: rgba(0,0,0,0.4); }
+    #btnExit:hover { 
+      background: rgba(239, 68, 68, 0.3); 
+      color: #fff;
+    }
 
-    /* Action Buttons */
-    .action-btn { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border: none; border-radius: 14px; cursor: pointer; color: #fff; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+    .main { 
+      flex: 1; 
+      padding: 24px 32px; 
+      overflow-y: auto; 
+    }
+
+    .top-bar { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .top-bar h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e5e7eb;
+    }
+
+    .container { 
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+      backdrop-filter: blur(20px); 
+      padding: 32px; 
+      border-radius: 16px; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      animation: slideIn 0.3s ease; 
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-title { 
+      font-size: 20px; 
+      font-weight: 700; 
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
     
-    #searchBtn { background: linear-gradient(135deg, #4a8cff, #9b59ff); box-shadow: 0 4px 15px rgba(74, 140, 255, 0.4); }
-    #searchBtn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(74, 140, 255, 0.6); }
+    label { 
+      font-size: 12px; 
+      font-weight: 600; 
+      margin-bottom: 6px; 
+      display: block; 
+      color: #cbd5e1;
+    }
     
-    #saveBtn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-    #saveBtn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    input[type="text"], input[type="url"], select, textarea { 
+      width: 100%; 
+      padding: 12px 14px; 
+      margin-bottom: 16px; 
+      font-size: 14px; 
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    input[type="text"]:focus, input[type="url"]:focus, select:focus, textarea:focus {
+      border-color: #3b82f6;
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
 
-    #result { margin-top: 30px; padding: 20px; background: rgba(100,255,100,0.1); border: 1px solid rgba(100,255,100,0.2); border-radius: 14px; display: none; text-align: center; color: inherit; }
-    a { color: #66aaff; text-decoration: none; font-weight: bold; }
-    a:hover { text-decoration: underline; }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+    }
 
-    /* Lists */
-    .history-panel { margin-top: 20px; }
-    .history-panel ul { list-style: none; }
-    .history-panel li { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
-    .history-panel li:last-child { border-bottom: none; }
-    .history-panel li:hover { background: rgba(255,255,255,0.05); border-radius: 8px; padding-left: 20px; } /* Little shift right on hover */
-    .history-meta { display: flex; flex-direction: column; }
-    .history-kw { font-weight: bold; font-size: 16px; }
-    .history-cat { font-size: 12px; opacity: 0.6; margin-top: 4px; }
-    .delete-btn { color: #ff5555; cursor: pointer; opacity: 0.5; padding: 8px; font-size: 14px; }
-    .delete-btn:hover { opacity: 1; transform: scale(1.2); }
+    .btn { 
+      padding: 12px 20px; 
+      font-size: 14px; 
+      font-weight: 600; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      color: #fff; 
+      display: inline-flex; 
+      justify-content: center; 
+      align-items: center; 
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+    
+    .btn-primary:hover:not(:disabled) { 
+      transform: translateY(-2px); 
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary { 
+      background: rgba(148, 163, 184, 0.15); 
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    
+    .btn-secondary:hover:not(:disabled) { 
+      background: rgba(148, 163, 184, 0.25);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: rgba(34, 197, 94, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .input-group input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .results-container {
+      margin-top: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.4) 100%);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border-left: 4px solid #3b82f6;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .result-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .result-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+
+    .result-meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .result-item {
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(59, 130, 246, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .result-item:hover {
+      transform: translateX(4px);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .result-label {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      color: #e5e7eb;
+      font-size: 13px;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .result-value a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    .result-value a:hover {
+      text-decoration: underline;
+    }
+
+    .spinner {
+      border: 3px solid rgba(148, 163, 184, 0.2);
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      text-align: center;
+      color: #94a3b8;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-left: 8px;
+    }
+
+    .badge-success {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+
+    .badge-warning {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+    }
+
+    .badge-info {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
 
     .view-section { display: none; }
     .view-section.active { display: block; }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .alert-success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .alert-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .alert-info {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    .saved-list {
+      list-style: none;
+    }
+
+    .saved-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .saved-info {
+      flex: 1;
+    }
+
+    .saved-title {
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+    }
+
+    .saved-meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .main::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main::-webkit-scrollbar-track {
+      background: rgba(148, 163, 184, 0.05);
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 4px;
+    }
+
+    .results-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .results-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .results-container::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 3px;
+    }
+
+    .tooltip {
+      position: relative;
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      background: rgba(15, 23, 42, 0.98);
+      color: #e5e7eb;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 6px;
+      position: fixed;
+      z-index: 10000;
+      left: 270px;
+      width: 240px;
+      font-size: 11px;
+      line-height: 1.4;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+    }
+
+    .tooltip .tooltip-text::before {
+      content: '';
+      position: absolute;
+      right: 100%;
+      top: 12px;
+      border: 6px solid transparent;
+      border-right-color: rgba(15, 23, 42, 0.98);
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .operator-btn {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: monospace;
+    }
+
+    .operator-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .operator-btn i {
+      font-size: 10px;
+    }
+
+    code {
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="sidebar">
-      <h2>LeadDork</h2>
-      <button id="navSearch" class="active"><i class="fas fa-magnifying-glass"></i> Search</button>
-      <button id="navSaved"><i class="fas fa-star"></i> Saved Searches</button>
-      <button id="navHistory"><i class="fas fa-clock"></i> History Log</button>
-      <button id="btnExit"><i class="fas fa-power-off"></i> Exit App</button>
+      <h2>Lead Intelligence</h2>
+      <button data-view="dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</button>
+      
+      <!-- Core Intelligence -->
+      <button data-view="webscraper" class="tooltip"><i class="fas fa-globe"></i> Contact Finder<span class="tooltip-text">Extract emails, phones, and social links from any website instantly.</span></button>
+      <button data-view="profile" class="tooltip"><i class="fas fa-user-tie"></i> Company Profile<span class="tooltip-text">Aggregated profile from Website, LinkedIn, GitHub, Careers pages in one view.</span></button>
+      
+      <!-- Growth & Opportunity Detection -->
+      <button data-view="growth" class="tooltip"><i class="fas fa-chart-line-up"></i> Growth Signals<span class="tooltip-text">Track subdomains, hiring, press releases, and expansion indicators.</span></button>
+      <button data-view="jobs" class="tooltip"><i class="fas fa-briefcase"></i> Hiring Intel<span class="tooltip-text">Detect tech hiring (Dev/UI/QA) - signals for staff augmentation pitch.</span></button>
+      <button data-view="business" class="tooltip"><i class="fas fa-building"></i> Business Intel<span class="tooltip-text">Funding announcements, product launches, ad campaigns - growth opportunities.</span></button>
+      
+      <!-- Technical Analysis -->
+      <button data-view="techstack" class="tooltip"><i class="fas fa-code"></i> Tech Analysis<span class="tooltip-text">Detect frameworks, CMS, and legacy tech needing migration.</span></button>
+      <button data-view="techhealth" class="tooltip"><i class="fas fa-heartbeat"></i> Tech Health<span class="tooltip-text">Find broken JS, no SSL, slow sites - IT service opportunities.</span></button>
+      
+      <!-- Keyword & Content Intelligence -->
+      <button data-view="keywords" class="tooltip"><i class="fas fa-key"></i> Keyword Discovery<span class="tooltip-text">Auto-expand keywords with synonyms, industry jargon, competitor terms.</span></button>
+      <button data-view="rssfeeds" class="tooltip"><i class="fas fa-rss"></i> Content Tracker<span class="tooltip-text">RSS feeds, blog activity, content frequency analysis.</span></button>
+      <button data-view="competitors" class="tooltip"><i class="fas fa-users-line"></i> Competitor Analysis<span class="tooltip-text">Monitor competitor activities and market positioning.</span></button>
+      
+      <!-- Advanced OSINT -->
+      <button data-view="dorking" class="tooltip"><i class="fas fa-search-plus"></i> Google Dorking<span class="tooltip-text">Advanced search operators to find hidden pages and documents.</span></button>
+      <button data-view="github" class="tooltip"><i class="fab fa-github"></i> GitHub OSINT<span class="tooltip-text">Discover repos, engineers, and tech stack through GitHub.</span></button>
+      
+      <!-- Quick Tools -->
+      <button data-view="whois"><i class="fas fa-shield-halved"></i> WHOIS</button>
+      <button data-view="sitemap"><i class="fas fa-sitemap"></i> Sitemap</button>
+      <button data-view="metadata"><i class="fas fa-tags"></i> SEO Data</button>
+      <button data-view="social"><i class="fas fa-hashtag"></i> Social Media</button>
+      <button data-view="scoring"><i class="fas fa-star"></i> Lead Scoring</button>
+      
+      <!-- Saved Data -->
+      <button data-view="saved"><i class="fas fa-bookmark"></i> Saved Results</button>
+      <button id="btnExit"><i class="fas fa-power-off"></i> Exit</button>
     </div>
 
     <div class="main">
       <div class="top-bar">
-        <label class="toggle">
-          <span class="icon" id="modeIcon">🌙</span>
-          <input type="checkbox" id="darkToggle">
-          <span class="slider"></span>
-        </label>
+        <h3 id="pageTitle">Dashboard</h3>
       </div>
 
-      <div class="container view-section active" id="viewSearch">
-        <h1>Auto Dork</h1>
-        <label>Category</label>
-        <select id="category">
-          <option value="animation">Animation / GIF / Lottie</option>
-          <option value="palette">Color Palette / Swatches</option>
-          <option value="drawing">Line Art / Sketch / Drawing</option>
-          <option value="stockimage">Stock Image (Transparent)</option>
-          <option value="stockvector">Stock Vector (SVG/EPS/AI)</option>
-          <option value="stockvideo">Stock Video (MP4/MOV)</option>
-          <option value="spritesheet">Sprite Sheet / Game Assets</option>
-          <option value="reference">Pose / Anatomy Reference</option>
-          <option value="brush">Brushes (Photoshop/Procreate)</option>
-          <option value="3dmodel">Free 3D Model (OBJ/FBX)</option>
-        </select>
-        <label>Keyword</label>
-        <input type="search" id="keyword" placeholder="e.g. Indian, Cyberpunk, Cat..." autofocus />
-        <button id="searchBtn" class="action-btn">Search with Dork Magic ✨</button>
-        <button id="saveBtn" class="action-btn">Save this Search ⭐</button>
-        <div id="result"></div>
+      <!-- Dashboard -->
+      <div class="view-section active" data-section="dashboard">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-chart-pie"></i> Analytics Overview</div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="statTotalScans">0</div>
+              <div class="stat-label">Total Scans</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statSavedResults">0</div>
+              <div class="stat-label">Saved Results</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statToday">0</div>
+              <div class="stat-label">Today</div>
+            </div>
+          </div>
+          <div class="section-title" style="margin-top: 24px;"><i class="fas fa-clock"></i> Recent Activity</div>
+          <div id="recentActivity"></div>
+        </div>
       </div>
 
-      <div class="container view-section" id="viewSaved">
-        <h1>Saved Searches</h1>
-        <div class="history-panel" id="savedPanel"></div>
+      <!-- Google Dorking -->
+      <div class="view-section" data-section="dorking">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-search-plus"></i> Google Dorking Intelligence</div>
+          
+          <label>Search Query</label>
+          <textarea id="dorkQuery" placeholder='Example: "startup" site:.in OR intitle:"AI automation"' style="min-height: 80px; resize: vertical; padding: 12px; font-family: monospace;"></textarea>
+          
+          <!-- Quick Operator Buttons -->
+          <div style="margin: 16px 0; padding: 16px; background: rgba(59,130,246,0.05); border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+            <h4 style="margin-bottom: 12px; color: #60a5fa; font-size: 14px;">Quick Operators</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <button class="operator-btn" data-operator='site:' title="Search specific domain"><i class="fas fa-globe"></i> site:</button>
+              <button class="operator-btn" data-operator='inurl:' title="Words in URL"><i class="fas fa-link"></i> inurl:</button>
+              <button class="operator-btn" data-operator='intitle:' title="Words in title"><i class="fas fa-heading"></i> intitle:</button>
+              <button class="operator-btn" data-operator='intext:' title="Words in body"><i class="fas fa-file-alt"></i> intext:</button>
+              <button class="operator-btn" data-operator='filetype:' title="Specific file types"><i class="fas fa-file"></i> filetype:</button>
+              <button class="operator-btn" data-operator='ext:' title="File extension"><i class="fas fa-file-code"></i> ext:</button>
+              <button class="operator-btn" data-operator='inanchor:' title="Words in link text"><i class="fas fa-anchor"></i> inanchor:</button>
+              <button class="operator-btn" data-operator='cache:' title="Cached version"><i class="fas fa-history"></i> cache:</button>
+              <button class="operator-btn" data-operator='related:' title="Related sites"><i class="fas fa-sitemap"></i> related:</button>
+              <button class="operator-btn" data-operator='info:' title="Site info"><i class="fas fa-info-circle"></i> info:</button>
+              <button class="operator-btn" data-operator='before:' title="Before date (YYYY-MM-DD)"><i class="fas fa-calendar-minus"></i> before:</button>
+              <button class="operator-btn" data-operator='after:' title="After date (YYYY-MM-DD)"><i class="fas fa-calendar-plus"></i> after:</button>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button class="operator-btn" data-operator=' OR ' title="Logical OR"><i class="fas fa-code-branch"></i> OR</button>
+              <button class="operator-btn" data-operator=' AND ' title="Logical AND"><i class="fas fa-plus"></i> AND</button>
+              <button class="operator-btn" data-operator='""' title="Exact phrase" data-wrap="true"><i class="fas fa-quote-left"></i> "Exact"</button>
+              <button class="operator-btn" data-operator='-' title="Exclude term"><i class="fas fa-minus"></i> Exclude</button>
+              <button class="operator-btn" data-operator='*' title="Wildcard"><i class="fas fa-asterisk"></i> Wildcard</button>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <small style="color: #94a3b8; line-height: 1.6;">
+              <strong>Examples:</strong><br>
+              • <code style="color: #60a5fa;">site:.edu "machine learning"</code> - Find ML content on .edu sites<br>
+              • <code style="color: #60a5fa;">intitle:"index of" "parent directory" inurl:backup</code> - Find exposed directories<br>
+              • <code style="color: #60a5fa;">filetype:pdf "confidential" site:example.com</code> - Find PDF files<br>
+              • <code style="color: #60a5fa;">intext:"@company.com" -site:company.com</code> - Find employee emails on other sites
+            </small>
+          </div>
+          
+          <button class="btn btn-primary" id="dorkBtn" style="width: 100%;"><i class="fas fa-search"></i> Search & Parse Results</button>
+          <div id="dorkResults"></div>
+        </div>
       </div>
 
-      <div class="container view-section" id="viewHistory">
-        <h1>Search History</h1>
-        <div class="history-panel" id="historyPanel"></div>
+      <!-- Web Scraper -->
+      <div class="view-section" data-section="webscraper">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-globe"></i> Web Contact Scraper</div>
+          <label>Target Website URL</label>
+          <div class="input-group">
+            <input type="url" id="webscraperUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="webscraperBtn"><i class="fas fa-search"></i> Scrape</button>
+          </div>
+          <div id="webscraperResults"></div>
+        </div>
+      </div>
+
+      <!-- GitHub Intelligence -->
+      <div class="view-section" data-section="github">
+        <div class="container">
+          <div class="section-title"><i class="fab fa-github"></i> GitHub OSINT</div>
+          <label>Company Name or Domain</label>
+          <div class="input-group">
+            <input type="text" id="githubCompany" placeholder="example.com or CompanyName">
+            <button class="btn btn-primary" id="githubBtn"><i class="fas fa-search"></i> Search GitHub</button>
+          </div>
+          <div id="githubResults"></div>
+        </div>
+      </div>
+
+      <!-- RSS Feeds -->
+      <div class="view-section" data-section="rssfeeds">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-rss"></i> RSS Feed Discovery</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="feedsUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="feedsBtn"><i class="fas fa-search"></i> Discover Feeds</button>
+          </div>
+          <div id="feedsResults"></div>
+        </div>
+      </div>
+
+      <!-- Competitor Analysis -->
+      <div class="view-section" data-section="competitors">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-chart-network"></i> Competitor Cross-Mapping</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="compUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="compBtn"><i class="fas fa-search"></i> Analyze</button>
+          </div>
+          <div id="compResults"></div>
+        </div>
+      </div>
+
+      <!-- Keyword Discovery & Analysis -->
+      <div class="view-section" data-section="keywords">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-key"></i> Keyword Discovery Engine</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Auto-expand keywords with synonyms, industry jargon, and discover related terms</p>
+          
+          <!-- Keyword Discovery -->
+          <div style="background: rgba(59,130,246,0.05); padding: 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid rgba(59,130,246,0.2);">
+            <h4 style="margin-bottom: 12px; color: #60a5fa;">🔍 Keyword Expansion</h4>
+            <label>Enter Keyword to Expand</label>
+            <div class="input-group">
+              <input type="text" id="discoverKeyword" placeholder="e.g., CRM, AI, automation">
+              <button class="btn btn-primary" id="discoverBtn"><i class="fas fa-lightbulb"></i> Discover Related</button>
+            </div>
+            <div id="discoverResults"></div>
+          </div>
+          
+          <!-- Keyword Analysis -->
+          <div style="background: rgba(139,92,246,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(139,92,246,0.2);">
+            <h4 style="margin-bottom: 12px; color: #a78bfa;">📊 Page Keyword Analysis</h4>
+            <label>Website URL</label>
+            <input type="url" id="keywordUrl" placeholder="https://example.com">
+            <label>Keywords (comma-separated, leave empty for defaults)</label>
+            <input type="text" id="keywordList" placeholder="automation, AI, CRM, enterprise, SaaS">
+            <button class="btn btn-primary" id="keywordBtn" style="margin-top: 12px;"><i class="fas fa-search"></i> Analyze Keywords</button>
+            <div id="keywordResults"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lead Scoring -->
+      <div class="view-section" data-section="scoring">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-star"></i> AI Lead Scoring</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="scoreUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="scoreBtn"><i class="fas fa-star"></i> Calculate Score</button>
+          </div>
+          <div id="scoreResults"></div>
+        </div>
+      </div>
+
+      <!-- WHOIS -->
+      <div class="view-section" data-section="whois">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-shield-halved"></i> WHOIS Domain Lookup</div>
+          <label>Domain Name</label>
+          <div class="input-group">
+            <input type="text" id="whoisDomain" placeholder="example.com">
+            <button class="btn btn-primary" id="whoisBtn"><i class="fas fa-search"></i> Lookup</button>
+          </div>
+          <div id="whoisResults"></div>
+        </div>
+      </div>
+
+      <!-- Tech Stack -->
+      <div class="view-section" data-section="techstack">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-code"></i> Technology Stack Detection</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="techstackUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="techstackBtn"><i class="fas fa-search"></i> Detect</button>
+          </div>
+          <div id="techstackResults"></div>
+        </div>
+      </div>
+
+      <!-- Social Intel -->
+      <div class="view-section" data-section="social">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-share-nodes"></i> Social Media Intelligence</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="socialUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="socialBtn"><i class="fas fa-search"></i> Extract</button>
+          </div>
+          <div id="socialResults"></div>
+        </div>
+      </div>
+
+      <!-- Site Mapper -->
+      <div class="view-section" data-section="sitemap">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-sitemap"></i> Sitemap & Robots Parser</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="sitemapUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="sitemapBtn"><i class="fas fa-search"></i> Parse</button>
+          </div>
+          <div id="sitemapResults"></div>
+        </div>
+      </div>
+
+      <!-- Metadata -->
+      <div class="view-section" data-section="metadata">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-tags"></i> SEO Metadata Extractor</div>
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="metadataUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="metadataBtn"><i class="fas fa-search"></i> Extract</button>
+          </div>
+          <div id="metadataResults"></div>
+        </div>
+      </div>
+
+      <!-- Saved Results -->
+      <div class="view-section" data-section="saved">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-bookmark"></i> Saved Results</div>
+          <div style="margin-bottom: 16px;">
+            <button class="btn btn-danger" id="clearSavedBtn"><i class="fas fa-trash"></i> Clear All</button>
+          </div>
+          <div id="savedContainer"></div>
+        </div>
+      </div>
+
+      <!-- Company Profile (Aggregated) -->
+      <div class="view-section" data-section="profile">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-user-tie"></i> Company Profile Aggregator</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Merge data from Website, LinkedIn, GitHub, Careers, Press into one enriched profile</p>
+          
+          <label>Company Domain</label>
+          <input type="text" id="profileDomain" placeholder="example.com">
+          
+          <label>Company Name (optional, for LinkedIn/GitHub search)</label>
+          <input type="text" id="profileCompany" placeholder="Acme Corp">
+          
+          <div class="input-group" style="margin-top: 12px;">
+            <button class="btn btn-primary" id="profileBtn"><i class="fas fa-search"></i> Build Complete Profile</button>
+          </div>
+          
+          <div id="profileResults"></div>
+        </div>
+      </div>
+
+      <!-- Growth Signals -->
+      <div class="view-section" data-section="growth">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-chart-line-up"></i> Company Growth Signals</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Track subdomains, SSL, hiring, press releases, and expansion indicators</p>
+          
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="growthUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="growthBtn"><i class="fas fa-search"></i> Detect Growth</button>
+          </div>
+          
+          <div id="growthResults"></div>
+        </div>
+      </div>
+
+      <!-- Job Posting Intelligence -->
+      <div class="view-section" data-section="jobs">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-briefcase"></i> Hiring Intelligence</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Detect tech hiring signals for staff augmentation pitch</p>
+          
+          <label>Website URL</label>
+          <input type="url" id="jobsUrl" placeholder="https://example.com">
+          
+          <label>Company Name (optional)</label>
+          <input type="text" id="jobsCompany" placeholder="Acme Corp">
+          
+          <div class="input-group" style="margin-top: 12px;">
+            <button class="btn btn-primary" id="jobsBtn"><i class="fas fa-search"></i> Analyze Hiring</button>
+          </div>
+          
+          <div id="jobsResults"></div>
+        </div>
+      </div>
+
+      <!-- Business Intelligence -->
+      <div class="view-section" data-section="business">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-building"></i> Business Intelligence Suite</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Funding, product launches, ad campaigns - comprehensive business insights</p>
+          
+          <label>Company Name</label>
+          <input type="text" id="bizCompany" placeholder="Acme Corp">
+          
+          <label>Domain (optional)</label>
+          <input type="text" id="bizDomain" placeholder="example.com">
+          
+          <div class="input-group" style="margin-top: 12px;">
+            <button class="btn btn-primary" id="bizBtn"><i class="fas fa-search"></i> Gather Intel</button>
+          </div>
+          
+          <div id="bizResults"></div>
+        </div>
+      </div>
+
+      <!-- Technical Health Monitor -->
+      <div class="view-section" data-section="techhealth">
+        <div class="container">
+          <div class="section-title"><i class="fas fa-heartbeat"></i> Technical Health Monitor</div>
+          <p style="color: #94a3b8; margin-bottom: 20px;">Find broken JS, no SSL, slow load, outdated CMS - IT service opportunities</p>
+          
+          <label>Website URL</label>
+          <div class="input-group">
+            <input type="url" id="healthUrl" placeholder="https://example.com">
+            <button class="btn btn-primary" id="healthBtn"><i class="fas fa-search"></i> Health Check</button>
+          </div>
+          
+          <div id="healthResults"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const dorks = {
-        animation: `"KEYWORD" (intitle:"animation" OR intext:"loop" OR intext:"gif" OR intext:"lottie") (filetype:gif OR filetype:json OR filetype:mp4 OR filetype:webm) -inurl:(signup login pinterest behance)`,
-        palette: `"KEYWORD" (intitle:"palette" OR intext:"color palette" OR intext:"swatches" OR intext:"hex") (filetype:png OR filetype:ase OR filetype:aco OR filetype:gpl)`,
-        drawing: `"KEYWORD" (intitle:"line art" OR intitle:"drawing" OR intitle:"sketch") (filetype:png OR filetype:jpg) (transparent OR "on transparent")`,
-        stockimage: `"KEYWORD" (filetype:png OR filetype:jpg) (intitle:"free" OR inurl:free OR inurl:cc0 OR inurl:"public domain") -inurl:(shutterstock istock getty adobe)`,
-        stockvector: `"KEYWORD" (filetype:svg OR filetype:eps OR filetype:ai OR filetype:pdf) (inurl:"free download" OR inurl:vector OR inurl:cc0)`,
-        stockvideo: `"KEYWORD" (filetype:mp4 OR filetype:mov) (site:pexels.com OR site:pixabay.com OR site:mixkit.co OR site:videvo.net OR site:coverr.co)`,
-        spritesheet: `"KEYWORD" (intitle:"sprite sheet" OR intext:"sprite sheet") filetype:png`,
-        reference: `"KEYWORD" (intitle:"reference" OR intitle:"pose" OR intitle:"anatomy") (filetype:jpg OR filetype:png)`,
-        brush: `"KEYWORD" (brushes OR "brush pack") (filetype:abr OR filetype:brush OR filetype:procreate) inurl:"free download"`,
-        "3dmodel": `"KEYWORD" (filetype:obj OR filetype:fbx OR filetype:gltf OR filetype:glb OR filetype:blend) (inurl:"free download" OR site:sketchfab.com OR site:thingiverse.com)`
-      };
+    const app = {
+      currentView: 'dashboard',
+      savedResults: [],
+      scanHistory: []
+    };
 
-      const views = { search: document.getElementById('viewSearch'), saved: document.getElementById('viewSaved'), history: document.getElementById('viewHistory') };
-      const navs = { search: document.getElementById('navSearch'), saved: document.getElementById('navSaved'), history: document.getElementById('navHistory') };
-
-      function switchView(viewName) {
-        Object.values(views).forEach(el => el.classList.remove('active'));
-        Object.values(navs).forEach(el => el.classList.remove('active'));
-        views[viewName].classList.add('active');
-        navs[viewName].classList.add('active');
-        if(viewName === 'saved') updateSaved();
-        if(viewName === 'history') updateHistory();
+    // Load saved data
+    function loadSavedData() {
+      const saved = localStorage.getItem('leadIntelResults');
+      if (saved) {
+        app.savedResults = JSON.parse(saved);
       }
-
-      navs.search.addEventListener('click', () => switchView('search'));
-      navs.saved.addEventListener('click', () => switchView('saved'));
-      navs.history.addEventListener('click', () => switchView('history'));
-
-      document.getElementById('btnExit').addEventListener('click', () => {
-        if(confirm('Close LeadDork completely?')) {
-          fetch('/shutdown', { method: 'POST' });
-          document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:#fff;'>App Closed. You can close this tab.</h1>";
-        }
-      });
-
-      function renderList(dataArray, elementId, isSavedList) {
-        const el = document.getElementById(elementId);
-        if(!dataArray || dataArray.length === 0) { el.innerHTML = '<p style="text-align:center; opacity:0.5;">Nothing here yet.</p>'; return; }
-        let html = '<ul>';
-        dataArray.forEach(item => {
-          html += `<li><div class="history-meta"><span class="history-kw">${item.keyword}</span><span class="history-cat">${item.category}</span></div><div class="actions"><i class="fas fa-trash delete-btn" onclick="deleteItem('${isSavedList ? 'saved' : 'history'}', ${item.id})"></i></div></li>`;
-        });
-        html += '</ul>';
-        el.innerHTML = html;
+      const history = localStorage.getItem('leadIntelHistory');
+      if (history) {
+        app.scanHistory = JSON.parse(history);
       }
+    }
 
-      window.deleteItem = function(type, id) {
-        if(!confirm('Delete this?')) return;
-        fetch(`/api/${type}/delete/${id}`, { method: 'DELETE' }).then(() => { if(type === 'saved') updateSaved(); else updateHistory(); });
-      };
+    // Save to localStorage
+    function saveToStorage() {
+      localStorage.setItem('leadIntelResults', JSON.stringify(app.savedResults));
+      localStorage.setItem('leadIntelHistory', JSON.stringify(app.scanHistory));
+    }
 
-      function updateHistory() { fetch('/api/history/get').then(res=>res.json()).then(data=>renderList(data.history,'historyPanel',false)); }
-      function updateSaved() { fetch('/api/saved/get').then(res=>res.json()).then(data=>renderList(data.saved,'savedPanel',true)); }
-
-      document.getElementById('searchBtn').addEventListener('click', () => {
-        const category = document.getElementById('category').value;
-        const keyword = document.getElementById('keyword').value.trim();
-        if(!keyword) return alert('Keyword required!');
-        const url = 'https://www.google.com/search?q=' + encodeURIComponent(dorks[category].replace(/KEYWORD/g, keyword));
-        document.getElementById('result').innerHTML = `<strong>Searching:</strong> ${keyword}<br><a href="${url}" target="_blank">Open Link</a>`;
-        document.getElementById('result').style.display = 'block';
-        fetch('/api/history/add', { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({keyword,category}) });
-        window.open(url, '_blank');
-      });
-
-      document.getElementById('saveBtn').addEventListener('click', () => {
-        const category = document.getElementById('category').value;
-        const keyword = document.getElementById('keyword').value.trim();
-        if(!keyword) return alert('Keyword required!');
-        fetch('/api/saved/add', { method: 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({keyword,category}) }).then(() => alert('Saved! ⭐'));
-      });
-
-      const darkToggle = document.getElementById('darkToggle');
-      darkToggle.addEventListener('change', () => {
-        document.body.classList.toggle('light');
-        document.getElementById('modeIcon').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+    // Navigation
+    document.querySelectorAll('.sidebar button[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        switchView(view);
       });
     });
+
+    function switchView(view) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sidebar button').forEach(el => el.classList.remove('active'));
+      
+      document.querySelector(`[data-section="${view}"]`).classList.add('active');
+      document.querySelector(`[data-view="${view}"]`).classList.add('active');
+      
+      app.currentView = view;
+      const titles = {
+        dashboard: 'Dashboard',
+        webscraper: 'Contact Finder',
+        profile: 'Company Profile',
+        growth: 'Growth Signals',
+        jobs: 'Hiring Intelligence',
+        business: 'Business Intel',
+        techstack: 'Tech Analysis',
+        techhealth: 'Tech Health Monitor',
+        keywords: 'Keyword Discovery',
+        rssfeeds: 'Content Tracker',
+        dorking: 'Google Dorking',
+        github: 'GitHub OSINT',
+        whois: 'WHOIS Lookup',
+        sitemap: 'Site Mapper',
+        metadata: 'SEO Data',
+        saved: 'Saved Results'
+      };
+      document.getElementById('pageTitle').textContent = titles[view];
+      
+      if (view === 'dashboard') updateDashboard();
+      if (view === 'saved') renderSavedResults();
+    }
+
+    // Exit
+    document.getElementById('btnExit').addEventListener('click', () => {
+      if (confirm('Exit application?')) {
+        fetch('/shutdown', { method: 'POST' });
+        document.body.innerHTML = "<div style='display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;'><h1 style='color:#e5e7eb;'>Application Closed</h1></div>";
+      }
+    });
+
+    // Utility Functions
+    function showLoading(containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '<div class="spinner"></div><div class="loading-text">Processing...</div>';
+    }
+
+    function showError(containerId, message) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
+    }
+
+    function showSuccess(containerId, message) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> ${message}</div>`;
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      alert('Copied to clipboard!');
+    }
+
+    // Global function for copying to clipboard (used in onclick attributes)
+    window.copyToClipboard = function(text) {
+      const textToCopy = typeof text === 'string' ? text : JSON.stringify(text, null, 2);
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(34,197,94,0.9); color: white; padding: 12px 24px; border-radius: 8px; z-index: 10000; animation: slideIn 0.3s ease;';
+        notification.innerHTML = '<i class="fas fa-check-circle"></i> Copied to clipboard!';
+        document.body.appendChild(notification);
+        setTimeout(() => {
+          notification.remove();
+        }, 2000);
+      }).catch(err => {
+        alert('Failed to copy: ' + err);
+      });
+    };
+
+    function addToHistory(type, url) {
+      app.scanHistory.unshift({ type, url, timestamp: new Date().toISOString() });
+      if (app.scanHistory.length > 50) {
+        app.scanHistory = app.scanHistory.slice(0, 50); // Keep only last 50
+      }
+      saveToStorage();
+      updateDashboard();
+    }
+
+    function saveResult(type, url, data) {
+      const result = {
+        id: Date.now(),
+        type: type,
+        url: url,
+        data: data,
+        timestamp: new Date().toISOString()
+      };
+      app.savedResults.unshift(result);
+      addToHistory(type, url);
+      saveToStorage();
+      updateDashboard();
+    }
+
+    // Web Scraper
+    document.getElementById('webscraperBtn').addEventListener('click', async () => {
+      const url = document.getElementById('webscraperUrl').value.trim();
+      if (!url) {
+        showError('webscraperResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('webscraperResults');
+      
+      try {
+        const res = await fetch('/api/scrape/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('webscraperResults', data.error);
+          return;
+        }
+
+        displayWebScraperResults(data, url);
+      } catch (err) {
+        showError('webscraperResults', 'Failed to scrape website: ' + err.message);
+      }
+    });
+
+    function displayWebScraperResults(data, url) {
+      const container = document.getElementById('webscraperResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Contact Information</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='copyText(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `<button class="icon-btn" onclick='saveResult("webscraper", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.emails && data.emails.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Emails Found (${data.emails.length})</div>`;
+        html += `<div class="result-value">${data.emails.join('<br>')}</div></div>`;
+      }
+      
+      if (data.phones && data.phones.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Phone Numbers (${data.phones.length})</div>`;
+        html += `<div class="result-value">${data.phones.join('<br>')}</div></div>`;
+      }
+      
+      if (data.social_links && Object.keys(data.social_links).length > 0) {
+        html += `<div class="result-item"><div class="result-label">Social Media</div><div class="result-value">`;
+        for (let [platform, link] of Object.entries(data.social_links)) {
+          html += `<strong>${platform}:</strong> <a href="${link}" target="_blank">${link}</a><br>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      if ((!data.emails || data.emails.length === 0) && 
+          (!data.phones || data.phones.length === 0) && 
+          (!data.social_links || Object.keys(data.social_links).length === 0)) {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No contact information found on this page</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // WHOIS Lookup
+    document.getElementById('whoisBtn').addEventListener('click', async () => {
+      const domain = document.getElementById('whoisDomain').value.trim();
+      if (!domain) {
+        showError('whoisResults', 'Please enter a domain');
+        return;
+      }
+
+      showLoading('whoisResults');
+      
+      try {
+        const res = await fetch('/api/whois/lookup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('whoisResults', data.error);
+          return;
+        }
+
+        displayWhoisResults(data, domain);
+      } catch (err) {
+        showError('whoisResults', 'Failed to lookup domain: ' + err.message);
+      }
+    });
+
+    function displayWhoisResults(data, domain) {
+      const container = document.getElementById('whoisResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Domain Information</div><div class="result-meta">${domain}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='copyText(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `<button class="icon-btn" onclick='saveResult("whois", "${domain}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.registrar) {
+        html += `<div class="result-item"><div class="result-label">Registrar</div><div class="result-value">${data.registrar}</div></div>`;
+      }
+      
+      if (data.creation_date) {
+        html += `<div class="result-item"><div class="result-label">Creation Date</div><div class="result-value">${data.creation_date}</div></div>`;
+      }
+      
+      if (data.expiration_date) {
+        html += `<div class="result-item"><div class="result-label">Expiration Date</div><div class="result-value">${data.expiration_date}</div></div>`;
+      }
+      
+      if (data.name_servers && data.name_servers.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Name Servers</div><div class="result-value">${data.name_servers.join('<br>')}</div></div>`;
+      }
+      
+      if (data.ip_address) {
+        html += `<div class="result-item"><div class="result-label">IP Address</div><div class="result-value">${data.ip_address}</div></div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Tech Stack Detection
+    document.getElementById('techstackBtn').addEventListener('click', async () => {
+      const url = document.getElementById('techstackUrl').value.trim();
+      if (!url) {
+        showError('techstackResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('techstackResults');
+      
+      try {
+        const res = await fetch('/api/tech/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('techstackResults', data.error);
+          return;
+        }
+
+        displayTechStackResults(data, url);
+      } catch (err) {
+        showError('techstackResults', 'Failed to detect technologies: ' + err.message);
+      }
+    });
+
+    function displayTechStackResults(data, url) {
+      const container = document.getElementById('techstackResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Technology Stack</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='copyText(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `<button class="icon-btn" onclick='saveResult("techstack", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.technologies && data.technologies.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Detected Technologies (${data.technologies.length})</div><div class="result-value">`;
+        data.technologies.forEach(tech => {
+          html += `<span class="badge badge-info">${tech}</span> `;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (data.server) {
+        html += `<div class="result-item"><div class="result-label">Web Server</div><div class="result-value">${data.server}</div></div>`;
+      }
+      
+      if (data.platform) {
+        html += `<div class="result-item"><div class="result-label">Platform</div><div class="result-value">${data.platform}</div></div>`;
+      }
+      
+      if (!data.technologies || data.technologies.length === 0) {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No specific technologies detected</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Social Intelligence
+    document.getElementById('socialBtn').addEventListener('click', async () => {
+      const url = document.getElementById('socialUrl').value.trim();
+      if (!url) {
+        showError('socialResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('socialResults');
+      
+      try {
+        const res = await fetch('/api/scrape/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('socialResults', data.error);
+          return;
+        }
+
+        displaySocialResults(data, url);
+      } catch (err) {
+        showError('socialResults', 'Failed to extract social links: ' + err.message);
+      }
+    });
+
+    function displaySocialResults(data, url) {
+      const container = document.getElementById('socialResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Social Media Profiles</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("social", "${url}", ${JSON.stringify(JSON.stringify(data.social_links || {}))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.social_links && Object.keys(data.social_links).length > 0) {
+        html += `<div class="result-item"><div class="result-label">Found Profiles (${Object.keys(data.social_links).length})</div><div class="result-value">`;
+        for (let [platform, link] of Object.entries(data.social_links)) {
+          html += `<div style="margin-bottom: 8px;"><strong>${platform}:</strong> <a href="${link}" target="_blank">${link}</a></div>`;
+        }
+        html += `</div></div>`;
+      } else {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No social media links found</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Sitemap Parser
+    document.getElementById('sitemapBtn').addEventListener('click', async () => {
+      const url = document.getElementById('sitemapUrl').value.trim();
+      if (!url) {
+        showError('sitemapResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('sitemapResults');
+      
+      try {
+        const res = await fetch('/api/sitemap/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('sitemapResults', data.error);
+          return;
+        }
+
+        displaySitemapResults(data, url);
+      } catch (err) {
+        showError('sitemapResults', 'Failed to parse sitemap: ' + err.message);
+      }
+    });
+
+    function displaySitemapResults(data, url) {
+      const container = document.getElementById('sitemapResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Site Structure</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='copyText(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `<button class="icon-btn" onclick='saveResult("sitemap", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.robots_txt) {
+        html += `<div class="result-item"><div class="result-label">Robots.txt Status</div><div class="result-value"><span class="badge badge-success">Found</span></div></div>`;
+      }
+      
+      if (data.sitemap_urls && data.sitemap_urls.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Sitemap URLs (${data.sitemap_urls.length})</div>`;
+        html += `<div class="result-value" style="max-height: 200px; overflow-y: auto;">`;
+        data.sitemap_urls.slice(0, 20).forEach(sitemapUrl => {
+          html += `${sitemapUrl}<br>`;
+        });
+        if (data.sitemap_urls.length > 20) {
+          html += `<em>...and ${data.sitemap_urls.length - 20} more</em>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      if (data.disallowed_paths && data.disallowed_paths.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Disallowed Paths</div>`;
+        html += `<div class="result-value">${data.disallowed_paths.join('<br>')}</div></div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Metadata Extractor
+    document.getElementById('metadataBtn').addEventListener('click', async () => {
+      const url = document.getElementById('metadataUrl').value.trim();
+      if (!url) {
+        showError('metadataResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('metadataResults');
+      
+      try {
+        const res = await fetch('/api/metadata/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('metadataResults', data.error);
+          return;
+        }
+
+        displayMetadataResults(data, url);
+      } catch (err) {
+        showError('metadataResults', 'Failed to extract metadata: ' + err.message);
+      }
+    });
+
+    function displayMetadataResults(data, url) {
+      const container = document.getElementById('metadataResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">SEO Metadata</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='copyText(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `<button class="icon-btn" onclick='saveResult("metadata", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.title) {
+        html += `<div class="result-item"><div class="result-label">Title</div><div class="result-value">${data.title}</div></div>`;
+      }
+      
+      if (data.description) {
+        html += `<div class="result-item"><div class="result-label">Description</div><div class="result-value">${data.description}</div></div>`;
+      }
+      
+      if (data.og_data && Object.keys(data.og_data).length > 0) {
+        html += `<div class="result-item"><div class="result-label">OpenGraph Data</div><div class="result-value">`;
+        for (let [key, value] of Object.entries(data.og_data)) {
+          html += `<strong>${key}:</strong> ${value}<br>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      if (data.twitter_data && Object.keys(data.twitter_data).length > 0) {
+        html += `<div class="result-item"><div class="result-label">Twitter Card Data</div><div class="result-value">`;
+        for (let [key, value] of Object.entries(data.twitter_data)) {
+          html += `<strong>${key}:</strong> ${value}<br>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      if (data.canonical) {
+        html += `<div class="result-item"><div class="result-label">Canonical URL</div><div class="result-value"><a href="${data.canonical}" target="_blank">${data.canonical}</a></div></div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Google Dorking - Operator button handlers
+    document.querySelectorAll('.operator-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const operator = btn.dataset.operator;
+        const textarea = document.getElementById('dorkQuery');
+        const cursorPos = textarea.selectionStart;
+        const textBefore = textarea.value.substring(0, cursorPos);
+        const textAfter = textarea.value.substring(cursorPos);
+        
+        // Check if this is a wrap operator (like quotes)
+        if (btn.dataset.wrap === 'true') {
+          const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+          if (selectedText) {
+            // Wrap selected text
+            textarea.value = textBefore + '\"' + selectedText + '\"' + textAfter;
+            textarea.selectionStart = cursorPos + 1;
+            textarea.selectionEnd = cursorPos + 1 + selectedText.length;
+          } else {
+            // Insert quotes with cursor in middle
+            textarea.value = textBefore + '\"\"' + textAfter;
+            textarea.selectionStart = cursorPos + 1;
+            textarea.selectionEnd = cursorPos + 1;
+          }
+        } else {
+          // Insert operator at cursor position
+          let insertion = operator;
+          
+          // Add space before if needed (for OR, AND)
+          if ([' OR ', ' AND '].includes(operator) && textBefore && !textBefore.endsWith(' ')) {
+            insertion = ' ' + operator.trim() + ' ';
+          }
+          
+          textarea.value = textBefore + insertion + textAfter;
+          
+          // Position cursor after operator
+          const newPos = cursorPos + insertion.length;
+          textarea.selectionStart = newPos;
+          textarea.selectionEnd = newPos;
+        }
+        
+        textarea.focus();
+      });
+    });
+
+    // Dynamic tooltip positioning
+    document.querySelectorAll('.sidebar .tooltip').forEach(btn => {
+      btn.addEventListener('mouseenter', function(e) {
+        const tooltip = this.querySelector('.tooltip-text');
+        if (tooltip) {
+          const rect = this.getBoundingClientRect();
+          tooltip.style.top = rect.top + 'px';
+        }
+      });
+    });
+
+    // Google Dorking
+    document.getElementById('dorkBtn').addEventListener('click', async () => {
+      const query = document.getElementById('dorkQuery').value.trim();
+      if (!query) {
+        showError('dorkResults', 'Please enter a search query');
+        return;
+      }
+
+      showLoading('dorkResults');
+      
+      try {
+        const res = await fetch('/api/dork/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('dorkResults', data.error);
+          return;
+        }
+
+        displayDorkResults(data, query);
+      } catch (err) {
+        showError('dorkResults', 'Dorking failed: ' + err.message);
+      }
+    });
+
+    function displayDorkResults(data, query) {
+      const container = document.getElementById('dorkResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Search Results</div><div class="result-meta">Query: ${query}</div></div>`;
+      html += `<div class="result-actions">`;
+      if (data.google_url) {
+        html += `<button class="icon-btn" onclick='window.open("${data.google_url}", "_blank")'><i class="fab fa-google"></i> Open in Google</button>`;
+      }
+      html += `<button class="icon-btn" onclick='saveResult("dorking", "${query}", ${JSON.stringify(JSON.stringify(data.results))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.note) {
+        html += `<div class="alert alert-info" style="margin: 12px 0;"><i class="fas fa-info-circle"></i> ${data.note}</div>`;
+      }
+      
+      if (data.results && data.results.length > 0) {
+        html += `<div class="result-item"><div class="result-label"><i class="fas fa-check-circle" style="color: #10b981;"></i> Found ${data.total} Results</div></div>`;
+        data.results.forEach((result, idx) => {
+          html += `<div class="result-item">`;
+          html += `<div class="result-label"><strong>${idx + 1}.</strong> ${result.title}</div>`;
+          html += `<div class="result-value"><a href="${result.url}" target="_blank" style="word-break: break-all;">${result.url}</a></div>`;
+          if (result.snippet) {
+            html += `<div class="result-value" style="margin-top: 4px; color: #94a3b8; font-size: 12px;">${result.snippet}</div>`;
+          }
+          html += `</div>`;
+        });
+      } else {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No results found. Google may be blocking automated requests.</div>`;
+        if (data.google_url) {
+          html += `<div style="margin-top: 12px; text-align: center;">`;
+          html += `<button class="btn btn-primary" onclick='window.open("${data.google_url}", "_blank")'><i class="fab fa-google"></i> Try Query in Google Directly</button>`;
+          html += `</div>`;
+        }
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // GitHub Intelligence
+    document.getElementById('githubBtn').addEventListener('click', async () => {
+      const company = document.getElementById('githubCompany').value.trim();
+      if (!company) {
+        showError('githubResults', 'Please enter a company name or domain');
+        return;
+      }
+
+      showLoading('githubResults');
+      
+      try {
+        const res = await fetch('/api/osint/github', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('githubResults', data.error);
+          return;
+        }
+
+        displayGitHubResults(data, company);
+      } catch (err) {
+        showError('githubResults', 'GitHub search failed: ' + err.message);
+      }
+    });
+
+    function displayGitHubResults(data, company) {
+      const container = document.getElementById('githubResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">GitHub Intelligence</div><div class="result-meta">${company}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("github", "${company}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.repos && data.repos.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Public Repositories (${data.repos.length})</div><div class="result-value">`;
+        data.repos.forEach(repo => {
+          html += `<a href="${repo.url}" target="_blank">${repo.name}</a><br>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (data.insights && data.insights.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Insights</div><div class="result-value">`;
+        data.insights.forEach(insight => {
+          html += `<span class="badge badge-info">${insight}</span> `;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (!data.repos || data.repos.length === 0) {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No public repositories found</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // RSS Feeds Discovery
+    document.getElementById('feedsBtn').addEventListener('click', async () => {
+      const url = document.getElementById('feedsUrl').value.trim();
+      if (!url) {
+        showError('feedsResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('feedsResults');
+      
+      try {
+        const res = await fetch('/api/osint/feeds', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('feedsResults', data.error);
+          return;
+        }
+
+        displayFeedsResults(data, url);
+      } catch (err) {
+        showError('feedsResults', 'Feed discovery failed: ' + err.message);
+      }
+    });
+
+    function displayFeedsResults(data, url) {
+      const container = document.getElementById('feedsResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">RSS Feeds</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("feeds", "${url}", ${JSON.stringify(JSON.stringify(data.feeds))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.feeds && data.feeds.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Discovered Feeds (${data.total})</div><div class="result-value">`;
+        data.feeds.forEach(feed => {
+          html += `<div style="margin-bottom: 8px;">`;
+          html += `<strong>${feed.title || feed.type}:</strong> <a href="${feed.url}" target="_blank">${feed.url}</a>`;
+          if (feed.status) html += ` <span class="badge badge-success">${feed.status}</span>`;
+          html += `</div>`;
+        });
+        html += `</div></div>`;
+      } else {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No RSS feeds found</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Competitor Analysis
+    document.getElementById('compBtn').addEventListener('click', async () => {
+      const url = document.getElementById('compUrl').value.trim();
+      if (!url) {
+        showError('compResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('compResults');
+      
+      try {
+        const res = await fetch('/api/osint/competitors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('compResults', data.error);
+          return;
+        }
+
+        displayCompResults(data, url);
+      } catch (err) {
+        showError('compResults', 'Analysis failed: ' + err.message);
+      }
+    });
+
+    function displayCompResults(data, url) {
+      const container = document.getElementById('compResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Competitor Intelligence</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("competitors", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      if (data.integrations && data.integrations.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Tech Integrations (${data.integration_count})</div><div class="result-value">`;
+        data.integrations.forEach(tech => {
+          html += `<span class="badge badge-info">${tech}</span> `;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (data.potential_partners && data.potential_partners.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Potential Partners</div><div class="result-value">`;
+        data.potential_partners.slice(0, 10).forEach(partner => {
+          html += `${partner}<br>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      if ((!data.integrations || data.integrations.length === 0) && (!data.potential_partners || data.potential_partners.length === 0)) {
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> No competitor data found</div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Keyword Discovery
+    document.getElementById('discoverBtn').addEventListener('click', async () => {
+      const keyword = document.getElementById('discoverKeyword').value.trim();
+      const results = document.getElementById('discoverResults');
+      
+      if (!keyword) {
+        results.innerHTML = '<div style="color: #ef4444; margin-top: 12px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 4px;">Please enter a keyword</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div style="color: #94a3b8; margin-top: 12px;"><i class="fas fa-spinner fa-spin"></i> Discovering related keywords...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/keywords/discover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keyword })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div style="color: #ef4444; margin-top: 12px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 4px;">${data.error}</div>`;
+          return;
+        }
+        
+        // Display results
+        let html = '<div style="margin-top: 16px; padding: 16px; background: rgba(15,23,42,0.8); border-radius: 8px;">';
+        
+        html += `<div style="margin-bottom: 12px;">`;
+        html += `<span style="color: #94a3b8;">Total Expanded:</span> `;
+        html += `<span style="color: #3b82f6; font-weight: 600; font-size: 18px;">${data.total_expanded}</span> keywords`;
+        html += `</div>`;
+        
+        // Related keywords
+        if (data.related_keywords?.length > 0) {
+          html += `<div style="margin-top: 12px;">`;
+          html += `<h5 style="color: #60a5fa; margin-bottom: 8px;">Related Keywords (${data.related_keywords.length})</h5>`;
+          html += `<div style="display: flex; flex-wrap: wrap; gap: 6px;">`;
+          data.related_keywords.forEach(kw => {
+            html += `<span style="background: rgba(59,130,246,0.2); color: #60a5fa; padding: 4px 10px; border-radius: 4px; font-size: 12px;">${kw}</span>`;
+          });
+          html += `</div></div>`;
+        }
+        
+        // Synonyms
+        if (data.synonyms?.length > 0) {
+          html += `<div style="margin-top: 12px;">`;
+          html += `<h5 style="color: #a78bfa; margin-bottom: 8px;">Synonyms (${data.synonyms.length})</h5>`;
+          html += `<div style="display: flex; flex-wrap: wrap; gap: 6px;">`;
+          data.synonyms.forEach(syn => {
+            html += `<span style="background: rgba(139,92,246,0.2); color: #a78bfa; padding: 4px 10px; border-radius: 4px; font-size: 12px;">${syn}</span>`;
+          });
+          html += `</div></div>`;
+        }
+        
+        // Industry jargon
+        if (data.industry_jargon?.length > 0) {
+          html += `<div style="margin-top: 12px;">`;
+          html += `<h5 style="color: #22c55e; margin-bottom: 8px;">Industry Jargon (${data.industry_jargon.length})</h5>`;
+          html += `<div style="display: flex; flex-wrap: wrap; gap: 6px;">`;
+          data.industry_jargon.forEach(jarg => {
+            html += `<span style="background: rgba(34,197,94,0.2); color: #22c55e; padding: 4px 10px; border-radius: 4px; font-size: 12px;">${jarg}</span>`;
+          });
+          html += `</div></div>`;
+        }
+        
+        // Copy all button
+        const allKeywords = [
+          ...data.related_keywords || [],
+          ...data.synonyms || [],
+          ...data.industry_jargon || []
+        ].join(', ');
+        
+        html += `<div style="margin-top: 16px;">`;
+        html += `<button class="btn btn-primary" onclick='copyToClipboard("${allKeywords.replace(/"/g, '&quot;')}")'><i class="fas fa-copy"></i> Copy All Keywords</button>`;
+        html += `</div>`;
+        
+        html += `</div>`;
+        results.innerHTML = html;
+        
+      } catch (error) {
+        results.innerHTML = `<div style="color: #ef4444; margin-top: 12px; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 4px;">Error: ${error.message}</div>`;
+      }
+    });
+
+    // Keyword Intelligence
+    document.getElementById('keywordBtn').addEventListener('click', async () => {
+      const url = document.getElementById('keywordUrl').value.trim();
+      const keywordList = document.getElementById('keywordList').value.trim();
+      
+      if (!url) {
+        showError('keywordResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('keywordResults');
+      
+      const keywords = keywordList ? keywordList.split(',').map(k => k.trim()) : [];
+      
+      try {
+        const res = await fetch('/api/osint/keywords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, keywords })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('keywordResults', data.error);
+          return;
+        }
+
+        displayKeywordResults(data, url);
+      } catch (err) {
+        showError('keywordResults', 'Keyword analysis failed: ' + err.message);
+      }
+    });
+
+    function displayKeywordResults(data, url) {
+      const container = document.getElementById('keywordResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">Keyword Intelligence</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("keywords", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      html += `<div class="result-item"><div class="result-label">Relevance Score</div>`;
+      html += `<div class="result-value"><span class="badge ${data.relevance_score >= 60 ? 'badge-success' : 'badge-warning'}" style="font-size: 14px; padding: 6px 12px;">${data.relevance_score}/100</span></div></div>`;
+      
+      if (data.keywords_found && data.keywords_found.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Keywords Found (${data.keywords_found.length})</div><div class="result-value">`;
+        data.keywords_found.forEach(kw => {
+          html += `<span class="badge badge-success">${kw}</span> `;
+        });
+        html += `</div></div>`;
+      }
+      
+      if (data.keyword_details && Object.keys(data.keyword_details).length > 0) {
+        html += `<div class="result-item"><div class="result-label">Keyword Analysis</div><div class="result-value">`;
+        for (let [keyword, details] of Object.entries(data.keyword_details)) {
+          html += `<strong>${keyword}:</strong> ${details.count} occurrences (${details.density}% density)<br>`;
+        }
+        html += `</div></div>`;
+      }
+      
+      html += `<div class="result-item"><div class="result-label">Total Words Analyzed</div><div class="result-value">${data.total_words.toLocaleString()}</div></div>`;
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Lead Scoring
+    document.getElementById('scoreBtn').addEventListener('click', async () => {
+      const url = document.getElementById('scoreUrl').value.trim();
+      if (!url) {
+        showError('scoreResults', 'Please enter a URL');
+        return;
+      }
+
+      showLoading('scoreResults');
+      
+      try {
+        const res = await fetch('/api/osint/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          showError('scoreResults', data.error);
+          return;
+        }
+
+        displayScoreResults(data, url);
+      } catch (err) {
+        showError('scoreResults', 'Lead scoring failed: ' + err.message);
+      }
+    });
+
+    function displayScoreResults(data, url) {
+      const container = document.getElementById('scoreResults');
+      
+      let html = '<div class="results-container">';
+      html += `<div class="result-card">`;
+      html += `<div class="result-header">`;
+      html += `<div><div class="result-title">AI Lead Score</div><div class="result-meta">${url}</div></div>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("scoring", "${url}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-bookmark"></i> Save</button>`;
+      html += `</div></div>`;
+      
+      const scoreColor = data.score >= 70 ? 'badge-success' : data.score >= 40 ? 'badge-warning' : 'badge-info';
+      html += `<div class="result-item"><div class="result-label">Lead Score</div>`;
+      html += `<div class="result-value"><span class="badge ${scoreColor}" style="font-size: 18px; padding: 8px 16px;">${data.score}/100</span></div></div>`;
+      
+      html += `<div class="result-item"><div class="result-label">Intent Level</div>`;
+      html += `<div class="result-value"><strong>${data.intent_level}</strong></div></div>`;
+      
+      html += `<div class="result-item"><div class="result-label">Recommendation</div>`;
+      html += `<div class="result-value"><span class="badge ${data.score >= 70 ? 'badge-success' : 'badge-info'}">${data.recommendation}</span></div></div>`;
+      
+      if (data.signals && data.signals.length > 0) {
+        html += `<div class="result-item"><div class="result-label">Buying Signals Detected (${data.signals.length})</div><div class="result-value">`;
+        data.signals.forEach(signal => {
+          html += `<div style="margin-bottom: 4px;">✓ ${signal}</div>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    // Saved Results
+    function renderSavedResults() {
+      const container = document.getElementById('savedContainer');
+      
+      if (app.savedResults.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-bookmark"></i><p>No saved results yet</p></div>';
+        return;
+      }
+      
+      let html = '<ul class="saved-list">';
+      app.savedResults.forEach((result, idx) => {
+        const date = new Date(result.timestamp).toLocaleString();
+        html += `<li class="saved-item">`;
+        html += `<div class="saved-info">`;
+        html += `<div class="saved-title">${result.type.toUpperCase()} - ${result.url}</div>`;
+        html += `<div class="saved-meta">${date}</div>`;
+        html += `</div>`;
+        html += `<div class="result-actions">`;
+        html += `<button class="icon-btn" onclick="viewSavedResult(${idx})"><i class="fas fa-eye"></i> View</button>`;
+        html += `<button class="icon-btn" onclick="deleteSavedResult(${idx})"><i class="fas fa-trash"></i> Delete</button>`;
+        html += `</div>`;
+        html += `</li>`;
+      });
+      html += '</ul>';
+      
+      container.innerHTML = html;
+    }
+
+    window.viewSavedResult = function(idx) {
+      const result = app.savedResults[idx];
+      alert('Saved Result:\n\n' + JSON.stringify(result.data, null, 2));
+    };
+
+    window.deleteSavedResult = function(idx) {
+      if (confirm('Delete this saved result?')) {
+        app.savedResults.splice(idx, 1);
+        saveToStorage();
+        renderSavedResults();
+        updateDashboard();
+      }
+    };
+
+    document.getElementById('clearSavedBtn').addEventListener('click', () => {
+      if (confirm('Delete ALL saved results?')) {
+        app.savedResults = [];
+        app.scanHistory = [];
+        saveToStorage();
+        renderSavedResults();
+        updateDashboard();
+      }
+    });
+
+    // ============== NEW ADVANCED OSINT HANDLERS ==============
+    
+    // Company Profile Aggregator
+    document.getElementById('profileBtn').addEventListener('click', async () => {
+      const domain = document.getElementById('profileDomain').value.trim();
+      const company = document.getElementById('profileCompany').value.trim();
+      const results = document.getElementById('profileResults');
+      
+      if (!domain) {
+        results.innerHTML = '<div class="result-card error">Please enter a domain</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Building comprehensive profile...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/profile/aggregate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain, company_name: company })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div class="result-card error">${data.error}</div>`;
+          return;
+        }
+        
+        displayProfileResults(data);
+        addToHistory('profile', domain);
+      } catch (error) {
+        results.innerHTML = `<div class="result-card error">Error: ${error.message}</div>`;
+      }
+    });
+
+    function displayProfileResults(data) {
+      const results = document.getElementById('profileResults');
+      
+      let html = '<div class="result-card">';
+      html += `<div class="result-header">`;
+      html += `<h3>${data.company}</h3>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("profile", "${data.domain}", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-save"></i> Save</button>`;
+      html += `<button class="icon-btn" onclick='copyToClipboard(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Completeness score
+      html += `<div class="score-badge" style="background: ${data.enriched_data.completeness >= 60 ? 'rgba(34,197,94,0.2)' : 'rgba(234,179,8,0.2)'}; color: ${data.enriched_data.completeness >= 60 ? '#22c55e' : '#eab308'}; display: inline-block; padding: 6px 12px; border-radius: 4px; margin: 16px 0;">`;
+      html += `Profile Completeness: ${data.enriched_data.completeness}%`;
+      html += `</div>`;
+      
+      // Sources
+      html += `<div style="margin-top: 16px;">`;
+      html += `<h4>Data Sources</h4>`;
+      
+      // Website
+      if (data.sources.website?.status === 'success') {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> Website - ${data.sources.website.emails?.length || 0} emails found</div>`;
+        if (data.sources.website.linkedin) {
+          html += `<div style="margin-left: 24px; margin-top: 4px;"><a href="${data.sources.website.linkedin}" target="_blank" style="color: #3b82f6;">LinkedIn Profile</a></div>`;
+        }
+      }
+      
+      // LinkedIn
+      if (data.sources.linkedin?.status === 'found') {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> LinkedIn - <a href="${data.sources.linkedin.url}" target="_blank" style="color: #3b82f6;">View Profile</a></div>`;
+      }
+      
+      // GitHub
+      if (data.sources.github?.repos?.length > 0) {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> GitHub - ${data.sources.github.repos.length} repos found</div>`;
+        data.sources.github.repos.forEach(repo => {
+          html += `<div style="margin-left: 24px; margin-top: 4px;"><a href="${repo.url}" target="_blank" style="color: #3b82f6;">${repo.name}</a></div>`;
+        });
+      }
+      
+      // Careers
+      if (data.sources.careers?.status === 'found') {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> Careers Page - <a href="${data.sources.careers.url}" target="_blank" style="color: #3b82f6;">View Jobs</a></div>`;
+      }
+      
+      // Press
+      if (data.sources.press?.status === 'found') {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> Press/News - <a href="${data.sources.press.url}" target="_blank" style="color: #3b82f6;">View News</a></div>`;
+      }
+      
+      html += `</div>`;
+      html += `</div>`;
+      
+      results.innerHTML = html;
+    }
+
+    // Growth Signals
+    document.getElementById('growthBtn').addEventListener('click', async () => {
+      const url = document.getElementById('growthUrl').value.trim();
+      const results = document.getElementById('growthResults');
+      
+      if (!url) {
+        results.innerHTML = '<div class="result-card error">Please enter a URL</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Detecting growth signals...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/growth/signals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div class="result-card error">${data.error}</div>`;
+          return;
+        }
+        
+        displayGrowthResults(data);
+        addToHistory('growth', url);
+      } catch (error) {
+        results.innerHTML = `<div class="result-card error">Error: ${error.message}</div>`;
+      }
+    });
+
+    function displayGrowthResults(data) {
+      const results = document.getElementById('growthResults');
+      
+      let html = '<div class="result-card">';
+      html += `<div class="result-header">`;
+      html += `<h3>Growth Analysis</h3>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("growth", "growth-scan", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-save"></i> Save</button>`;
+      html += `<button class="icon-btn" onclick='copyToClipboard(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Score
+      html += `<div class="score-container" style="text-align: center; margin: 20px 0;">`;
+      html += `<div class="score-circle" style="width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#3b82f6 ${data.growth_score * 3.6}deg, rgba(59,130,246,0.1) 0deg); display: flex; align-items: center; justify-content: center; margin: 0 auto;">`;
+      html += `<div style="width: 100px; height: 100px; border-radius: 50%; background: rgba(15,23,42,0.95); display: flex; align-items: center; justify-content: center; flex-direction: column;">`;
+      html += `<div style="font-size: 32px; font-weight: 700; color: #3b82f6;">${data.growth_score}</div>`;
+      html += `<div style="font-size: 11px; color: #94a3b8;">Growth Score</div>`;
+      html += `</div></div>`;
+      html += `<div style="margin-top: 12px; font-size: 14px; color: #e5e7eb;">${data.growth_level}</div>`;
+      html += `</div>`;
+      
+      // Signals
+      html += `<div style="margin-top: 20px;">`;
+      html += `<h4>Growth Signals Detected (${data.signals.length})</h4>`;
+      data.signals.forEach(signal => {
+        html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> ${signal}</div>`;
+      });
+      html += `</div>`;
+      
+      // Subdomains
+      if (data.active_subdomains?.length > 0) {
+        html += `<div style="margin-top: 16px;">`;
+        html += `<h4>Active Subdomains (${data.active_subdomains.length})</h4>`;
+        html += `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">`;
+        data.active_subdomains.forEach(sub => {
+          html += `<span style="background: rgba(59,130,246,0.2); color: #60a5fa; padding: 4px 10px; border-radius: 4px; font-size: 12px;">${sub}</span>`;
+        });
+        html += `</div></div>`;
+      }
+      
+      // Recommendation
+      html += `<div style="margin-top: 20px; padding: 12px; background: rgba(59,130,246,0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">`;
+      html += `<strong>Recommendation:</strong> ${data.recommendation}`;
+      html += `</div>`;
+      
+      html += `</div>`;
+      results.innerHTML = html;
+    }
+
+    // Hiring Intelligence
+    document.getElementById('jobsBtn').addEventListener('click', async () => {
+      const url = document.getElementById('jobsUrl').value.trim();
+      const company = document.getElementById('jobsCompany').value.trim();
+      const results = document.getElementById('jobsResults');
+      
+      if (!url) {
+        results.innerHTML = '<div class="result-card error">Please enter a URL</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Analyzing hiring signals...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/jobs/intelligence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, company_name: company })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div class="result-card error">${data.error}</div>`;
+          return;
+        }
+        
+        displayJobsResults(data);
+        addToHistory('jobs', url);
+      } catch (error) {
+        results.innerHTML = `<div class="result-card error">Error: ${error.message}</div>`;
+      }
+    });
+
+    function displayJobsResults(data) {
+      const results = document.getElementById('jobsResults');
+      
+      let html = '<div class="result-card">';
+      html += `<div class="result-header">`;
+      html += `<h3>Hiring Intelligence</h3>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("jobs", "jobs-scan", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-save"></i> Save</button>`;
+      html += `<button class="icon-btn" onclick='copyToClipboard(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Opportunity score
+      html += `<div style="text-align: center; margin: 20px 0;">`;
+      html += `<div style="font-size: 48px; font-weight: 700; color: ${data.opportunity_score >= 40 ? '#22c55e' : data.opportunity_score >= 20 ? '#eab308' : '#94a3b8'};">${data.opportunity_score}</div>`;
+      html += `<div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">Opportunity Score</div>`;
+      html += `<div style="margin-top: 8px; padding: 8px 16px; background: ${data.opportunity_score >= 40 ? 'rgba(34,197,94,0.2)' : data.opportunity_score >= 20 ? 'rgba(234,179,8,0.2)' : 'rgba(148,163,184,0.2)'}; color: ${data.opportunity_score >= 40 ? '#22c55e' : data.opportunity_score >= 20 ? '#eab308' : '#94a3b8'}; border-radius: 4px; display: inline-block;">`;
+      html += data.opportunity_level;
+      html += `</div></div>`;
+      
+      // Tech roles
+      if (data.tech_roles?.length > 0) {
+        html += `<div style="margin-top: 20px;">`;
+        html += `<h4>Tech Roles Hiring For (${data.tech_roles.length})</h4>`;
+        data.tech_roles.forEach(role => {
+          html += `<div class="signal-item"><i class="fas fa-briefcase" style="color: #3b82f6;"></i> ${role}</div>`;
+        });
+        html += `</div>`;
+      }
+      
+      // Hiring signals
+      if (data.hiring_signals?.length > 0) {
+        html += `<div style="margin-top: 16px;">`;
+        html += `<h4>Hiring Signals</h4>`;
+        data.hiring_signals.forEach(signal => {
+          html += `<div class="signal-item"><i class="fas fa-check-circle" style="color: #22c55e;"></i> ${signal}</div>`;
+        });
+        html += `</div>`;
+      }
+      
+      // Careers URL
+      if (data.careers_url) {
+        html += `<div style="margin-top: 16px;">`;
+        html += `<a href="${data.careers_url}" target="_blank" class="btn btn-primary" style="display: inline-block;"><i class="fas fa-external-link"></i> View Careers Page</a>`;
+        html += `</div>`;
+      }
+      
+      // Pitch
+      html += `<div style="margin-top: 20px; padding: 12px; background: rgba(59,130,246,0.1); border-radius: 6px; border-left: 3px solid #3b82f6;">`;
+      html += `<strong>Pitch Opportunity:</strong> ${data.pitch}`;
+      html += `</div>`;
+      
+      html += `</div>`;
+      results.innerHTML = html;
+    }
+
+    // Business Intelligence
+    document.getElementById('bizBtn').addEventListener('click', async () => {
+      const company = document.getElementById('bizCompany').value.trim();
+      const domain = document.getElementById('bizDomain').value.trim();
+      const results = document.getElementById('bizResults');
+      
+      if (!company && !domain) {
+        results.innerHTML = '<div class="result-card error">Please enter company name or domain</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Gathering business intelligence...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/business/intelligence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company_name: company, domain })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div class="result-card error">${data.error}</div>`;
+          return;
+        }
+        
+        displayBusinessResults(data);
+        addToHistory('business', company || domain);
+      } catch (error) {
+        results.innerHTML = `<div class="result-card error">Error: ${error.message}</div>`;
+      }
+    });
+
+    function displayBusinessResults(data) {
+      const results = document.getElementById('bizResults');
+      
+      let html = '<div class="result-card">';
+      html += `<div class="result-header">`;
+      html += `<h3>Business Intelligence</h3>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("business", "biz-intel", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-save"></i> Save</button>`;
+      html += `<button class="icon-btn" onclick='copyToClipboard(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Business score
+      html += `<div style="text-align: center; margin: 20px 0;">`;
+      html += `<div style="font-size: 48px; font-weight: 700; color: ${data.business_score >= 50 ? '#22c55e' : data.business_score >= 25 ? '#eab308' : '#94a3b8'};">${data.business_score}</div>`;
+      html += `<div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">Business Activity Score</div>`;
+      html += `<div style="margin-top: 8px; padding: 8px 16px; background: ${data.business_score >= 50 ? 'rgba(34,197,94,0.2)' : data.business_score >= 25 ? 'rgba(234,179,8,0.2)' : 'rgba(148,163,184,0.2)'}; color: ${data.business_score >= 50 ? '#22c55e' : data.business_score >= 25 ? '#eab308' : '#94a3b8'}; border-radius: 4px; display: inline-block;">`;
+      html += data.business_level;
+      html += `</div></div>`;
+      
+      // Funding
+      html += `<div style="margin-top: 20px;">`;
+      html += `<h4>💰 Funding Intelligence</h4>`;
+      html += `<div style="padding: 12px; background: rgba(15,23,42,0.5); border-radius: 6px; margin-top: 8px;">`;
+      html += `<div style="font-weight: 600; color: ${data.funding.status === 'likely_funded' ? '#22c55e' : '#94a3b8'};">Status: ${data.funding.status.replace('_', ' ').toUpperCase()}</div>`;
+      if (data.funding.signals?.length > 0) {
+        data.funding.signals.forEach(signal => {
+          html += `<div class="signal-item" style="margin-top: 8px;"><i class="fas fa-check"></i> ${signal}</div>`;
+        });
+      }
+      html += `</div></div>`;
+      
+      // Product launches
+      html += `<div style="margin-top: 16px;">`;
+      html += `<h4>🚀 Product Launch Activity</h4>`;
+      html += `<div style="padding: 12px; background: rgba(15,23,42,0.5); border-radius: 6px; margin-top: 8px;">`;
+      html += `<div style="font-weight: 600; color: ${data.product_launches.status === 'active' ? '#22c55e' : '#94a3b8'};">Status: ${data.product_launches.status.toUpperCase()}</div>`;
+      if (data.product_launches.signals?.length > 0) {
+        data.product_launches.signals.forEach(signal => {
+          html += `<div class="signal-item" style="margin-top: 8px;"><i class="fas fa-check"></i> ${signal}</div>`;
+        });
+      }
+      html += `</div></div>`;
+      
+      // Ad presence
+      html += `<div style="margin-top: 16px;">`;
+      html += `<h4>📢 Advertising & Marketing</h4>`;
+      html += `<div style="padding: 12px; background: rgba(15,23,42,0.5); border-radius: 6px; margin-top: 8px;">`;
+      html += `<div style="font-weight: 600; color: ${data.ad_presence.status === 'detected' ? '#22c55e' : '#94a3b8'};">Status: ${data.ad_presence.status.toUpperCase()}</div>`;
+      if (data.ad_presence.signals?.length > 0) {
+        data.ad_presence.signals.forEach(signal => {
+          html += `<div class="signal-item" style="margin-top: 8px;"><i class="fas fa-check"></i> ${signal}</div>`;
+        });
+      }
+      html += `</div></div>`;
+      
+      // Opportunities
+      if (data.opportunities?.length > 0) {
+        html += `<div style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1)); border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">`;
+        html += `<h4 style="margin-bottom: 12px;">💡 Business Opportunities</h4>`;
+        data.opportunities.forEach(opp => {
+          html += `<div class="signal-item"><i class="fas fa-lightbulb" style="color: #eab308;"></i> ${opp}</div>`;
+        });
+        html += `</div>`;
+      }
+      
+      html += `</div>`;
+      results.innerHTML = html;
+    }
+
+    // Technical Health Monitor
+    document.getElementById('healthBtn').addEventListener('click', async () => {
+      const url = document.getElementById('healthUrl').value.trim();
+      const results = document.getElementById('healthResults');
+      
+      if (!url) {
+        results.innerHTML = '<div class="result-card error">Please enter a URL</div>';
+        return;
+      }
+      
+      results.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Running health diagnostics...</div>';
+      
+      try {
+        const response = await fetch('http://localhost:5000/api/tech/health', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          results.innerHTML = `<div class="result-card error">${data.error}</div>`;
+          return;
+        }
+        
+        displayHealthResults(data);
+        addToHistory('techhealth', url);
+      } catch (error) {
+        results.innerHTML = `<div class="result-card error">Error: ${error.message}</div>`;
+      }
+    });
+
+    function displayHealthResults(data) {
+      const results = document.getElementById('healthResults');
+      
+      let html = '<div class="result-card">';
+      html += `<div class="result-header">`;
+      html += `<h3>Technical Health Report</h3>`;
+      html += `<div class="result-actions">`;
+      html += `<button class="icon-btn" onclick='saveResult("techhealth", "health-scan", ${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-save"></i> Save</button>`;
+      html += `<button class="icon-btn" onclick='copyToClipboard(${JSON.stringify(JSON.stringify(data))})'><i class="fas fa-copy"></i> Copy</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Health score with color
+      const scoreColor = data.health_score >= 80 ? '#22c55e' : data.health_score >= 60 ? '#eab308' : '#ef4444';
+      
+      html += `<div style="text-align: center; margin: 20px 0;">`;
+      html += `<div class="score-circle" style="width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(${scoreColor} ${data.health_score * 3.6}deg, rgba(148,163,184,0.1) 0deg); display: flex; align-items: center; justify-content: center; margin: 0 auto;">`;
+      html += `<div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(15,23,42,0.95); display: flex; align-items: center; justify-content: center; flex-direction: column;">`;
+      html += `<div style="font-size: 40px; font-weight: 700; color: ${scoreColor};">${data.health_score}</div>`;
+      html += `<div style="font-size: 11px; color: #94a3b8;">Health Score</div>`;
+      html += `</div></div>`;
+      html += `<div style="margin-top: 12px; font-size: 14px; color: ${scoreColor};">${data.health_level}</div>`;
+      html += `</div>`;
+      
+      // Critical issues
+      if (data.critical_issues?.length > 0) {
+        html += `<div style="margin-top: 20px;">`;
+        html += `<h4 style="color: #ef4444;">⚠️ Critical Issues (${data.critical_issues.length})</h4>`;
+        data.critical_issues.forEach(issue => {
+          html += `<div class="signal-item" style="border-left: 3px solid #ef4444; background: rgba(239,68,68,0.1);"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> ${issue}</div>`;
+        });
+        html += `</div>`;
+      }
+      
+      // Warnings
+      if (data.warnings?.length > 0) {
+        html += `<div style="margin-top: 16px;">`;
+        html += `<h4 style="color: #eab308;">⚡ Warnings (${data.warnings.length})</h4>`;
+        data.warnings.forEach(warning => {
+          html += `<div class="signal-item" style="border-left: 3px solid #eab308; background: rgba(234,179,8,0.1);"><i class="fas fa-exclamation-circle" style="color: #eab308;"></i> ${warning}</div>`;
+        });
+        html += `</div>`;
+      }
+      
+      // Opportunity
+      html += `<div style="margin-top: 20px; padding: 16px; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1)); border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">`;
+      html += `<h4 style="margin-bottom: 8px;">💡 Service Opportunity</h4>`;
+      html += `<div style="font-size: 14px;">${data.opportunity}</div>`;
+      html += `</div>`;
+      
+      html += `</div>`;
+      results.innerHTML = html;
+    }
+
+    // Dashboard
+    function updateDashboard() {
+      document.getElementById('statTotalScans').textContent = app.scanHistory.length;
+      document.getElementById('statSavedResults').textContent = app.savedResults.length;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const todayScans = app.scanHistory.filter(s => s.timestamp.startsWith(today)).length;
+      document.getElementById('statToday').textContent = todayScans;
+      
+      const container = document.getElementById('recentActivity');
+      if (app.scanHistory.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No activity yet</p></div>';
+        return;
+      }
+      
+      let html = '<ul class="saved-list">';
+      app.scanHistory.slice(0, 5).forEach(item => {
+        const date = new Date(item.timestamp).toLocaleString();
+        html += `<li class="saved-item">`;
+        html += `<div class="saved-info">`;
+        html += `<div class="saved-title">${item.type.toUpperCase()}</div>`;
+        html += `<div class="saved-meta">${item.url} - ${date}</div>`;
+        html += `</div>`;
+        html += `</li>`;
+      });
+      html += '</ul>';
+      container.innerHTML = html;
+    }
+
+    // Initialize
+    loadSavedData();
+    updateDashboard();
   </script>
 </body>
 </html>

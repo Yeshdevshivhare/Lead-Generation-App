@@ -9,6 +9,29 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Import modular blueprints (NEW - replaces monolithic scraper.py)
+try:
+    from scraper_core import scraper_core_bp
+    app.register_blueprint(scraper_core_bp)
+    print("✓ Core scraping module loaded (contacts, WHOIS, tech, sitemap, metadata)")
+except ImportError as e:
+    print(f"Warning: scraper_core.py not found: {e}")
+
+try:
+    from scraper_osint import scraper_osint_bp
+    app.register_blueprint(scraper_osint_bp)
+    print("✓ OSINT module loaded (dorking, GitHub, RSS)")
+except ImportError as e:
+    print(f"Warning: scraper_osint.py not found: {e}")
+
+# Import remaining endpoints from original scraper.py
+try:
+    from scraper import scraper_bp
+    app.register_blueprint(scraper_bp)
+    print("✓ Additional endpoints loaded (growth, profile, jobs, business, health)")
+except ImportError as e:
+    print(f"Warning: scraper.py not found: {e}")
+
 # ------------------ PATH FIXES ------------------
 def get_resource_path(relative_path):
     """ Get absolute path to resource (index.html inside the exe) """
